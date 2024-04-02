@@ -113,6 +113,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
+    // mockito
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.ktx)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
