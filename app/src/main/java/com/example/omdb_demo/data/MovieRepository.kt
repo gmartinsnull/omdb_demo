@@ -11,10 +11,10 @@ abstract class MovieRepository {
     /**
      * attempts to retrieve movie data from local database. Otherwise, fetches from API
      */
-    abstract fun getMovies(title: String, offset: Int): Flow<ApiResult<List<Movie>>>
+    abstract fun getMovies(title: String): Flow<ApiResult<List<Movie>>>
 
     /**
      * attempts to retrieve movie data from API endpoint. If successful, stores in local database
      */
-    abstract fun fetchMovies(title: String, offset: Int): Flow<ApiResult<List<Movie>>>
+    abstract fun fetchMovies(title: String): Flow<ApiResult<List<Movie>>>
 }

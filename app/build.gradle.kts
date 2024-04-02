@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    kotlin("kapt")
+    alias(libs.plugins.kspPlugin)
+    alias(libs.plugins.daggerHiltAndroid)
 }
 
 android {
@@ -22,7 +25,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_URL", "\"http://www.omdbapi.com/\"")
+            buildConfigField("String", "API_URL", "\"https://www.omdbapi.com\"")
             buildConfigField("String", "API_KEY", "\"e1a1c5f3\"")
         }
         release {
@@ -59,6 +62,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // ui
     implementation(libs.androidx.ui)
@@ -72,6 +76,7 @@ dependencies {
 
     // hilt
     implementation(libs.androidx.hilt)
+    kapt(libs.androidx.hilt.android.compiler)
 
     // retrofit
     implementation(libs.retrofit)
@@ -80,6 +85,7 @@ dependencies {
     // moshi
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.kotlin.codegen)
 
     // coroutines
     implementation(libs.coroutines)
@@ -94,10 +100,10 @@ dependencies {
     // room
     implementation(libs.room)
     annotationProcessor(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
     testImplementation(libs.room.testing)
     implementation(libs.room.paging)
-//    ksp("androidx.room:room-compiler:${rootProject.extra["room"]}")
 
     // coil
     implementation(libs.coil)

@@ -8,6 +8,7 @@ import com.example.omdb_demo.data.local.AppDatabase
 import com.example.omdb_demo.data.local.MovieDao
 import com.example.omdb_demo.data.remote.MovieService
 import com.example.omdb_demo.data.remote.RemoteDataSource
+import com.example.omdb_demo.domain.GetMovieByTitle
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -53,4 +54,10 @@ object DataModule {
         movieDao: MovieDao,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): MovieRepository = MovieRepositoryImpl(remoteDataSource, movieDao, ioDispatcher)
+
+    @Singleton
+    @Provides
+    fun provideGetMovieByTitle(
+        repository: MovieRepository
+    ): GetMovieByTitle = GetMovieByTitle(repository)
 }
