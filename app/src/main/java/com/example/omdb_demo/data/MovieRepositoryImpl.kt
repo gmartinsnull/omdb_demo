@@ -27,12 +27,14 @@ class MovieRepositoryImpl @Inject constructor(
 
     override fun getMovies(title: String): Flow<ApiResult<List<Movie>>> = channelFlow {
         try {
-            val data: List<Movie> = if (title.isNotEmpty()) // retrieves all movies saved in the db, otherwise, returns movies with similar titles
+            val data: List<Movie> =
+                if (title.isNotEmpty()) // retrieves all movies saved in the db, otherwise, returns movies with similar titles
                     movieDao.getMovieByTitle(title).first()
                 else
                     movieDao.getAll().first()
-
-            if (data.isEmpty()) { // checking if data has already been fetched into db
+            if (data.isEmpty() && title.isEmpty()) {
+                send(ApiResult.error(ApiError(301, "Movie catalog empty")))
+            } else if (data.isEmpty()) { // checking if data has already been fetched into db
                 send(fetchMovies(title).first())
             } else {
                 send(ApiResult.success(data))
@@ -49,7 +51,7 @@ class MovieRepositoryImpl @Inject constructor(
                     result.data?.search?.forEach {
                         movieDao.insertAll(it)
                     }
-                    val storedData = movieDao.getAll().first()
+                    val storedData = movieDao.getMovieByTitle(title).first()
                     ApiResult.success(storedData)
                 }
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg workouts: Movie)
+    fun insertAll(vararg movies: Movie)
 
     @Query("SELECT * FROM movie")
     fun getAll(): Flow<List<Movie>>
