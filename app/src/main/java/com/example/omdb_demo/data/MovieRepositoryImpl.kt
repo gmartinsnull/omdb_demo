@@ -27,7 +27,11 @@ class MovieRepositoryImpl @Inject constructor(
 
     override fun getMovies(title: String): Flow<ApiResult<List<Movie>>> = channelFlow {
         try {
-            val data = movieDao.getAll().first()
+            val data: List<Movie> = if (title.isNotEmpty()) // retrieves all movies saved in the db, otherwise, returns movies with similar titles
+                    movieDao.getMovieByTitle(title).first()
+                else
+                    movieDao.getAll().first()
+
             if (data.isEmpty()) { // checking if data has already been fetched into db
                 send(fetchMovies(title).first())
             } else {

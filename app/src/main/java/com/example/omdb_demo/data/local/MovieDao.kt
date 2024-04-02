@@ -16,4 +16,7 @@ interface MovieDao {
 
     @Query("SELECT * FROM movie")
     fun getAll(): Flow<List<Movie>>
+
+    @Query("SELECT * FROM movie WHERE title LIKE '%' || :title || '%'")
+    fun getMovieByTitle(title: String): Flow<List<Movie>>
 }

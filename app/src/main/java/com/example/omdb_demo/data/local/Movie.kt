@@ -13,7 +13,10 @@ import java.util.Locale
 @Entity
 data class Movie(
     @PrimaryKey
+    @Json(name = "Title")
     val title: String,
+    @Json(name = "Year")
     val year: Int,
+    @Json(name = "Poster")
     val poster: String
 )
