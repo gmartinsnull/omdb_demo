@@ -31,11 +31,9 @@ class MoviesViewModel @Inject constructor(
             getMovieByTitle(title).collect { result ->
                 _state.value = when (result.status) {
                     Status.SUCCESS -> UiState.Loaded(result.data ?: emptyList())
-                    Status.ERROR -> {
-                        UiState.Error(
-                            result.error?.message ?: "error while retrieving movies"
-                        )
-                    }
+                    Status.ERROR -> UiState.Error(
+                        result.error?.message ?: "error while retrieving movies"
+                    )
                 }
             }
         }

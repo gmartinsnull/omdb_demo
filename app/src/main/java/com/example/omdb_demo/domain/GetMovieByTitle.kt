@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- *  usecase class responsible for isolating logic for get movie by title action
+ *  usecase class responsible for isolating logic for get movie by title event
  */
 class GetMovieByTitle @Inject constructor(private val repository: MovieRepository) {
     operator fun invoke(title: String): Flow<ApiResult<List<Movie>>> {
