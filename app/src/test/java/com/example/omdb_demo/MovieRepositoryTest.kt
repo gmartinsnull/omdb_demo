@@ -162,6 +162,6 @@ class MovieRepositoryTest {
                 "Jurassic Park III",
                 "2001",
                 ""
-            ),
+            )
         )
 }
