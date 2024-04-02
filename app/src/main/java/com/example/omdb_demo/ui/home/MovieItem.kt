@@ -94,7 +94,10 @@ fun MovieItem(
             onClick = {
                 Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_LONG).show()
             }) {
-            Text("Details")
+            Text(
+                color = Color.White,
+                text = "Details"
+            )
         }
     }
 }

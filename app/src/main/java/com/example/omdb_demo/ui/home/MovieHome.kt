@@ -78,8 +78,13 @@ fun MovieHome(
                 if (state.data.isNotEmpty()) {
                     Column {
                         LazyVerticalGrid(
-                            modifier = modifier.padding(top = 10.dp, start = 16.dp, end = 16.dp),
-                            columns = GridCells.Fixed(2),
+                            modifier = modifier.padding(
+                                top = 10.dp,
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 10.dp
+                            ),
+                            columns = GridCells.Adaptive(120.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
