@@ -1,5 +1,6 @@
 package com.example.omdb_demo.data
 
+import android.util.Log
 import com.example.omdb_demo.data.local.Movie
 import com.example.omdb_demo.data.local.MovieDao
 import com.example.omdb_demo.data.remote.ApiError
@@ -33,7 +34,8 @@ class MovieRepositoryImpl @Inject constructor(
                 else
                     movieDao.getAll().first()
             if (data.isEmpty() && title.isEmpty()) {
-                send(ApiResult.error(ApiError(301, "Movie catalog empty")))
+                Log.i("INFO", "Movie catalog empty")
+                send(ApiResult.success(emptyList()))
             } else if (data.isEmpty()) { // checking if data has already been fetched into db
                 send(fetchMovies(title).first())
             } else {
@@ -48,11 +50,20 @@ class MovieRepositoryImpl @Inject constructor(
         return remoteDataSource.fetchMovieByTitle(title).map { result ->
             when (result.status) {
                 Status.SUCCESS -> {
-                    result.data?.search?.forEach {
-                        movieDao.insertAll(it)
+                    if (result.data?.error != null) {
+                        ApiResult.error(
+                            ApiError(
+                                result.error?.code ?: 404,
+                                result.data.error
+                            )
+                        )
+                    } else {
+                        result.data?.search?.forEach {
+                            movieDao.insertAll(it)
+                        }
+                        val storedData = movieDao.getMovieByTitle(title).first()
+                        ApiResult.success(storedData)
                     }
-                    val storedData = movieDao.getMovieByTitle(title).first()
-                    ApiResult.success(storedData)
                 }
 
                 Status.ERROR -> ApiResult.error(

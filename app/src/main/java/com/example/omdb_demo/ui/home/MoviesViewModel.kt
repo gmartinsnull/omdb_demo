@@ -32,13 +32,9 @@ class MoviesViewModel @Inject constructor(
                 _state.value = when (result.status) {
                     Status.SUCCESS -> UiState.Loaded(result.data ?: emptyList())
                     Status.ERROR -> {
-                        if (result.error?.code == 301) {
-                            UiState.Empty
-                        } else {
-                            UiState.Error(
-                                result.error?.message ?: "error while retrieving movies"
-                            )
-                        }
+                        UiState.Error(
+                            result.error?.message ?: "error while retrieving movies"
+                        )
                     }
                 }
             }

@@ -8,5 +8,9 @@ import com.squareup.moshi.Json
  */
 data class MovieResponse(
     @Json(name = "Search")
-    val search: List<Movie>
+    val search: List<Movie>?,
+    @Json(name = "Response")
+    val response: String?,
+    @Json(name = "Error")
+    val error: String?
 )

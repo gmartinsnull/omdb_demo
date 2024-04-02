@@ -22,11 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.example.omdb_demo.R
 import com.example.omdb_demo.data.local.Movie
 
 /**
@@ -51,7 +53,6 @@ fun MovieItem(
 ) {
     Box(
         modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp)
             .width(120.dp)
             .height(250.dp)
             .clip(shape = RoundedCornerShape(14.dp))
@@ -60,7 +61,10 @@ fun MovieItem(
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = rememberAsyncImagePainter(model = item.poster),
+            painter = rememberAsyncImagePainter(
+                model = item.poster,
+                error = painterResource(id = R.drawable.poster_not_found)
+            ),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -83,10 +87,13 @@ fun MovieItem(
             )
         }
         Button(
-            modifier = Modifier.width(120.dp).padding(bottom = 5.dp).align(Alignment.BottomCenter),
+            modifier = Modifier
+                .width(120.dp)
+                .padding(bottom = 5.dp)
+                .align(Alignment.BottomCenter),
             onClick = {
-            Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_LONG).show()
-        }) {
+                Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_LONG).show()
+            }) {
             Text("Details")
         }
     }
