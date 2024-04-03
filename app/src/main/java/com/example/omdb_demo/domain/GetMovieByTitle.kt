@@ -11,6 +11,6 @@ import javax.inject.Inject
  */
 class GetMovieByTitle @Inject constructor(private val repository: MovieRepository) {
     operator fun invoke(title: String): Flow<ApiResult<List<Movie>>> {
-        return repository.getMovies(title)
+        return repository.getMovieByTitle(title)
     }
 }

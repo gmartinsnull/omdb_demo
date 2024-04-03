@@ -1,6 +1,5 @@
 package com.example.omdb_demo.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,7 +25,6 @@ import com.example.omdb_demo.data.local.Movie
  */
 @Composable
 fun MoviesHomeScreen() {
-    val context = LocalContext.current
     val vm: MoviesViewModel = viewModel()
     val state = vm.state.collectAsState()
 
@@ -41,9 +38,6 @@ fun MoviesHomeScreen() {
                 .fillMaxSize()
                 .padding(innerPadding),
             state = state.value,
-            onClick = {
-                Toast.makeText(context, "movie title: ${it.title}", Toast.LENGTH_LONG).show()
-            },
             onSearch = {
                 vm.fetchData(it)
             },
@@ -58,7 +52,6 @@ fun MoviesHomeScreen() {
 fun MovieHome(
     modifier: Modifier = Modifier,
     state: UiState,
-    onClick: (Movie) -> Unit,
     onSearch: (String) -> Unit,
     onRefresh: () -> Unit
 ) {
@@ -91,7 +84,7 @@ fun MovieHome(
                             items(state.data) { movie ->
                                 MovieItemScreen(
                                     movieItem = movie,
-                                    onClick = onClick
+                                    onClick = { }
                                 )
                             }
                         }
@@ -162,7 +155,6 @@ fun MoviesHomePreview() {
                 ),
             )
         ),
-        onClick = {},
         onSearch = {},
         onRefresh = {
 

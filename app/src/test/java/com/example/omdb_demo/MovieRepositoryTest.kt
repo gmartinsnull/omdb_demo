@@ -1,6 +1,6 @@
 package com.example.omdb_demo
 
-import com.example.omdb_demo.data.MovieRepositoryImpl
+import com.example.omdb_demo.data.MovieRepository
 import com.example.omdb_demo.data.local.Movie
 import com.example.omdb_demo.data.local.MovieDao
 import com.example.omdb_demo.data.remote.ApiError
@@ -37,7 +37,7 @@ class MovieRepositoryTest {
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = UnconfinedTestDispatcher(testScheduler)
 
-    private lateinit var repository: MovieRepositoryImpl
+    private lateinit var repository: MovieRepository
 
     @Mock
     private lateinit var remoteDataSource: RemoteDataSource
@@ -47,7 +47,7 @@ class MovieRepositoryTest {
 
     @Before
     fun setup() {
-        repository = MovieRepositoryImpl(remoteDataSource, dao, testDispatcher)
+        repository = MovieRepository(remoteDataSource, dao, testDispatcher)
         Dispatchers.setMain(testDispatcher)
     }
 
@@ -57,7 +57,7 @@ class MovieRepositoryTest {
     }
 
     @Test
-    fun `fetch movie network - success`() = runTest {
+    fun `fetch movie by title network - success`() = runTest {
         val response = genMovies()
         val movieTitle = "Jurassic Park"
         `when`(remoteDataSource.fetchMovieByTitle(movieTitle)).thenReturn(
@@ -73,7 +73,7 @@ class MovieRepositoryTest {
         )
         `when`(dao.getMovieByTitle(movieTitle)).thenReturn(flowOf(emptyList()), flowOf(response))
 
-        val result = repository.getMovies(movieTitle).toList()
+        val result = repository.getMovieByTitle(movieTitle).toList()
 
         verify(remoteDataSource).fetchMovieByTitle(movieTitle)
         verify(dao, Mockito.times(2)).getMovieByTitle(movieTitle)
@@ -82,40 +82,53 @@ class MovieRepositoryTest {
     }
 
     @Test
-    fun `fetch movies network - error`() = runTest {
+    fun `fetch movie by title network - error`() = runTest {
         val movieTitle = "zaaaaa"
         `when`(remoteDataSource.fetchMovieByTitle(movieTitle)).thenReturn(
             flowOf(
                 ApiResult.error(
                     ApiError(
-                        404,
-                        "movie not found"
+                        500,
+                        "internal api error"
                     )
                 )
             )
         )
         `when`(dao.getMovieByTitle(movieTitle)).thenReturn(flowOf(emptyList()))
 
-        val result = repository.getMovies(movieTitle).toList()
+        val result = repository.getMovieByTitle(movieTitle).toList()
 
+        verify(dao).getMovieByTitle(movieTitle)
         verify(remoteDataSource).fetchMovieByTitle(movieTitle)
         verify(dao).getMovieByTitle(movieTitle)
 
         assertTrue(result[0].status == Status.ERROR)
-        assertTrue(result[0].error?.code == 404)
+        assertTrue(result[0].data == null)
     }
 
     @Test
-    fun `fetch movie network - success - empty title - database all`() = runTest {
+    fun `fetch all movies database - success`() = runTest {
         val response = genMovies()
-        val movieTitle = ""
         `when`(dao.getAll()).thenReturn(flowOf(response))
 
-        val result = repository.getMovies(movieTitle).toList()
+        val result = repository.getMovies().toList()
 
         verify(dao).getAll()
 
+        assertTrue(result[0].status == Status.SUCCESS)
         assertTrue(result[0].data?.size == 3)
+    }
+
+    @Test
+    fun `fetch all movies database - success - empty`() = runTest {
+        `when`(dao.getAll()).thenReturn(flowOf(emptyList()))
+
+        val result = repository.getMovies().toList()
+
+        verify(dao).getAll()
+
+        assertTrue(result[0].status == Status.SUCCESS)
+        assertTrue(result[0].data?.size == 0)
     }
 
     @Test
@@ -131,16 +144,14 @@ class MovieRepositoryTest {
         )
         `when`(dao.getMovieByTitle(movieTitle)).thenReturn(flowOf(emptyList()))
 
-        val result = repository.getMovies(movieTitle).toList()
+        val result = repository.getMovieByTitle(movieTitle).toList()
 
         verify(remoteDataSource).fetchMovieByTitle(movieTitle)
         verify(dao).getMovieByTitle(movieTitle)
 
         assertTrue(result[0].status == Status.ERROR)
         assertTrue(result[0].data == null)
-        assertTrue(result[0].error is ApiError)
-        assertTrue((result[0].error as ApiError).code == 404)
-        assertTrue((result[0].error as ApiError).message == "Movie not found!")
+        assertTrue(result[0].error?.message == "Movie not found!")
     }
 
     /**

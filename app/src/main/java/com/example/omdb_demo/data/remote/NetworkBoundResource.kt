@@ -1,33 +1,34 @@
-import com.example.omdb_demo.data.remote.Resource
+import com.example.omdb_demo.data.remote.ApiError
+import com.example.omdb_demo.data.remote.ApiResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 
+/**
+ * A generic class that can provide a resource backed by both the database and the network
+ */
 inline fun <ResultType, RequestType> networkBoundResource(
     crossinline query: () -> Flow<ResultType>,
     crossinline fetch: suspend () -> RequestType,
     crossinline saveFetchResult: suspend (RequestType) -> Unit,
     crossinline onFetchFailed: (Throwable) -> Unit = { Unit },
     crossinline shouldFetch: (ResultType) -> Boolean = { true }
-) = flow<Resource<ResultType>> {
-    emit(Resource.loading(null))
+) = flow {
     val data = query().first()
 
     val flow = if (shouldFetch(data)) {
-        emit(Resource.loading(data))
 
         try {
             saveFetchResult(fetch())
-            query().map { Resource.success(it) }
+            val queryResult = query().first()
+            ApiResult.success(queryResult)
         } catch (throwable: Throwable) {
             onFetchFailed(throwable)
-            query().map { Resource.error(throwable.message ?: "", it) }
+            ApiResult.error(ApiError(0, throwable.message ?: ""))
         }
     } else {
-        query().map { Resource.success(it) }
+        ApiResult.success(data)
     }
 
-    emitAll(flow)
+    emit(flow)
 }

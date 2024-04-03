@@ -5,6 +5,7 @@ import com.example.omdb_demo.data.remote.ApiError
 import com.example.omdb_demo.data.remote.ApiResult
 import com.example.omdb_demo.data.remote.Status
 import com.example.omdb_demo.domain.GetMovieByTitle
+import com.example.omdb_demo.domain.GetMovies
 import com.example.omdb_demo.ui.home.MoviesViewModel
 import com.example.omdb_demo.ui.home.UiState
 import junit.framework.TestCase.assertTrue
@@ -43,9 +44,12 @@ class MoviesHomeViewModelTest {
     @Mock
     private lateinit var getMovieByTitle: GetMovieByTitle
 
+    @Mock
+    private lateinit var getMovies: GetMovies
+
     @Before
     fun init() {
-        viewModel = MoviesViewModel(getMovieByTitle)
+        viewModel = MoviesViewModel(getMovies, getMovieByTitle)
         Dispatchers.setMain(testDispatcher)
     }
 
@@ -55,7 +59,7 @@ class MoviesHomeViewModelTest {
     }
 
     @Test
-    fun `ui state - success`() = runTest {
+    fun `ui state  - get movie by title - success`() = runTest {
         val fakeGetMovieByTitle = FakeGetMovieByTitle<List<Movie>>()
 
         `when`(getMovieByTitle("Jurassic Park")).thenReturn(fakeGetMovieByTitle.flow)
@@ -79,12 +83,62 @@ class MoviesHomeViewModelTest {
     }
 
     @Test
-    fun `ui state - error`() = runTest {
+    fun `ui state - get movie by title - error`() = runTest {
         val fakeGetMovieByTitle = FakeGetMovieByTitle<List<Movie>>()
 
         `when`(getMovieByTitle("zaaaaa")).thenReturn(fakeGetMovieByTitle.flow)
 
         viewModel.fetchData("zaaaaa")
+
+        val state = mutableListOf<UiState>()
+
+        backgroundScope.launch(testDispatcher) {
+            viewModel.state.onEach(state::add).collect()
+        }
+
+        val response = ApiResult(
+            status = Status.ERROR,
+            data = emptyList<Movie>(),
+            error = ApiError(404, "movie not found")
+        )
+        fakeGetMovieByTitle.emit(response)
+
+        assertTrue(state.size == 2)
+        assertThat(state[1], instanceOf(UiState.Error::class.java))
+        assertTrue((state[1] as UiState.Error).errorMessage == "movie not found")
+    }
+
+    @Test
+    fun `ui state  - get movies - success`() = runTest {
+        val fakeGetMovieByTitle = FakeGetMovieByTitle<List<Movie>>()
+
+        `when`(getMovies()).thenReturn(fakeGetMovieByTitle.flow)
+
+        viewModel.fetchData("")
+
+        val state = mutableListOf<UiState>()
+
+        backgroundScope.launch(testDispatcher) {
+            viewModel.state.onEach(state::add).collect()
+        }
+
+        val response = ApiResult.success(genMovies())
+        fakeGetMovieByTitle.emit(response)
+
+
+        assertTrue(state.size == 2)
+        assertThat(state, instanceOf(ArrayList::class.java))
+        assertTrue((state[1] as UiState.Loaded).data.size == 3)
+        assertTrue((state[1] as UiState.Loaded).data[1].title == "The Lost World: Jurassic Park")
+    }
+
+    @Test
+    fun `ui state - get movies - error`() = runTest {
+        val fakeGetMovieByTitle = FakeGetMovieByTitle<List<Movie>>()
+
+        `when`(getMovies()).thenReturn(fakeGetMovieByTitle.flow)
+
+        viewModel.fetchData("")
 
         val state = mutableListOf<UiState>()
 

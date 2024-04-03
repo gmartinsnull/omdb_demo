@@ -14,7 +14,7 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg movies: Movie)
 
-    @Query("SELECT * FROM movie")
+    @Query("SELECT * FROM movie ORDER BY title, year DESC")
     fun getAll(): Flow<List<Movie>>
 
     @Query("SELECT * FROM movie WHERE title LIKE '%' || :title || '%'")

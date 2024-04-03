@@ -3,12 +3,12 @@ package com.example.omdb_demo.di
 import android.content.Context
 import androidx.room.Room
 import com.example.omdb_demo.data.MovieRepository
-import com.example.omdb_demo.data.MovieRepositoryImpl
 import com.example.omdb_demo.data.local.AppDatabase
 import com.example.omdb_demo.data.local.MovieDao
 import com.example.omdb_demo.data.remote.MovieService
 import com.example.omdb_demo.data.remote.RemoteDataSource
 import com.example.omdb_demo.domain.GetMovieByTitle
+import com.example.omdb_demo.domain.GetMovies
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -49,15 +49,21 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideMovieRepository(
+    fun provideMovieRepositoryImpl(
         remoteDataSource: RemoteDataSource,
         movieDao: MovieDao,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
-    ): MovieRepository = MovieRepositoryImpl(remoteDataSource, movieDao, ioDispatcher)
+    ): MovieRepository = MovieRepository(remoteDataSource, movieDao, ioDispatcher)
 
     @Singleton
     @Provides
     fun provideGetMovieByTitle(
         repository: MovieRepository
     ): GetMovieByTitle = GetMovieByTitle(repository)
+
+    @Singleton
+    @Provides
+    fun provideGetMovies(
+        repository: MovieRepository
+    ): GetMovies = GetMovies(repository)
 }
