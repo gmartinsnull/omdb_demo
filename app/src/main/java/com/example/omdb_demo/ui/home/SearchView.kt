@@ -3,6 +3,7 @@ package com.example.omdb_demo.ui.home
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,11 +30,13 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun SearchViewComponent(
+    modifier: Modifier,
     onSearch: (String) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     SearchView(
+        modifier = modifier.widthIn(0.dp,800.dp),
         query = searchQuery,
         onSearching = {
             searchQuery = it
@@ -47,14 +50,14 @@ fun SearchViewComponent(
 
 @Composable
 fun SearchView(
+    modifier: Modifier = Modifier,
     query: String,
     onSearch: (String) -> Unit,
     onSearching: (String) -> Unit,
     keyboardController: SoftwareKeyboardController?
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(top = 15.dp, start = 5.dp, end = 5.dp),
         contentAlignment = Alignment.Center
     ) {

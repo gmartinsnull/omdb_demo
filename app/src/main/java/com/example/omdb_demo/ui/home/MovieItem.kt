@@ -1,10 +1,7 @@
 package com.example.omdb_demo.ui.home
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.omdb_demo.R
 import com.example.omdb_demo.data.local.Movie
+import com.example.omdb_demo.ui.theme.MainTheme
 
 /**
  *  composable class responsible for displaying a movie item
@@ -39,17 +37,15 @@ fun MovieItemScreen(
     movieItem: Movie,
     onClick: (Movie) -> Unit
 ) {
-    val context = LocalContext.current
-    MovieItem(context, movieItem) {
+    MovieItem(movieItem) {
         onClick.invoke(movieItem)
     }
 }
 
 @Composable
 fun MovieItem(
-    context: Context,
     item: Movie,
-    onClick: () -> Unit
+    onClick: (Movie) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -57,13 +53,13 @@ fun MovieItem(
             .height(250.dp)
             .clip(shape = RoundedCornerShape(14.dp))
             .background(MaterialTheme.colorScheme.tertiary)
-            .clickable(onClick = onClick)
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = rememberAsyncImagePainter(
                 model = item.poster,
-                error = painterResource(id = R.drawable.poster_not_found)
+                error = painterResource(id = R.drawable.poster_not_found),
+                placeholder = painterResource(id = R.drawable.movie_poster_placeholder)
             ),
             contentDescription = null,
             contentScale = ContentScale.Crop
@@ -91,12 +87,11 @@ fun MovieItem(
                 .width(120.dp)
                 .padding(bottom = 5.dp)
                 .align(Alignment.BottomCenter),
-            onClick = {
-                Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_LONG).show()
-            }) {
+            onClick = { onClick.invoke(item) }
+        ) {
             Text(
                 color = Color.White,
-                text = "Details"
+                text = stringResource(id = R.string.card_btn_text)
             )
         }
     }
@@ -105,14 +100,15 @@ fun MovieItem(
 @Preview(showBackground = true)
 @Composable
 fun MovieItemPreview() {
-    MovieItem(
-        LocalContext.current,
-        item = Movie(
-            "Jurassic Park",
-            "1993",
-            "https://m.media-amazon.com/images/M/MV5BMzRmY2EzODUtMWNiMi00MWJlLWFjMGYtY2Y0YWIwOTNkZmY2XkEyXkFqcGdeQXVyNjExODE1MDc@._V1_SX300.jpg"
-        )
-    ) {
+    MainTheme {
+        MovieItem(
+            item = Movie(
+                "Jurassic Park",
+                "1993",
+                "https://m.media-amazon.com/images/M/MV5BMzRmY2EzODUtMWNiMi00MWJlLWFjMGYtY2Y0YWIwOTNkZmY2XkEyXkFqcGdeQXVyNjExODE1MDc@._V1_SX300.jpg"
+            )
+        ) {
 
+        }
     }
 }
